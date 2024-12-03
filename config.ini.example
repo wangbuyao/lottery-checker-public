@@ -1,0 +1,5 @@
+[BaiduOCR]
+# 请在百度AI开放平台申请API密钥：https://ai.baidu.com/
+# 将获取到的API Key和Secret Key填写在下方
+API_KEY = your_api_key_here
+SECRET_KEY = your_secret_key_here 

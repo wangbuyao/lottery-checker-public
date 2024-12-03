@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>大乐透彩票验证</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        .main-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .page-title {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        
+        .page-title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            border-radius: 3px;
+        }
+        
+        .upload-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            border: none;
+        }
+        
+        .upload-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 50%;
+            margin: 0 5px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .front-number {
+            background-color: #e8f4f8;
+            color: #2980b9;
+            border: 2px solid #3498db;
+        }
+        
+        .back-number {
+            background-color: #e8f6ea;
+            color: #27ae60;
+            border: 2px solid #2ecc71;
+        }
+        
+        .matched {
+            background-color: #2ecc71;
+            color: white;
+            border-color: #27ae60;
+            animation: pulse 1s;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .separator {
+            display: inline-block;
+            margin: 0 15px;
+            font-weight: bold;
+            color: #7f8c8d;
+        }
+        
+        .prize-highlight {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #e74c3c;
+            padding: 0.5rem;
+            border-radius: 5px;
+            background-color: #fef9f9;
+            display: inline-block;
+        }
+        
+        .custom-file-upload {
+            position: relative;
+            overflow: hidden;
+            padding: 2rem;
+            border: 2px dashed #bdc3c7;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-file-upload:hover {
+            border-color: #3498db;
+            background-color: #f7f9fc;
+        }
+        
+        .custom-file-upload input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: #3498db;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-verify {
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            border: none;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-verify:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .result-card {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .result-card .card-header {
+            background: linear-gradient(to right, #3498db, #2ecc71);
+            color: white;
+            border: none;
+            padding: 1rem;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <h1 class="page-title">大乐透彩票验证</h1>
+        
+        <div class="card upload-card">
+            <div class="card-body">
+                <form id="uploadForm">
+                    <div class="custom-file-upload mb-4">
+                        <input type="file" class="form-control" id="ticket" name="ticket" accept="image/*">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <h5>点击或拖拽上传彩票图片</h5>
+                        <p class="text-muted">支持 JPG、PNG 格式</p>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-verify">
+                            <i class="fas fa-search me-2"></i>验证彩票
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="loading mt-4">
+                    <div class="loading-spinner mx-auto mb-3"></div>
+                    <p>正在处理中...</p>
+                </div>
+                
+                <div id="result" class="mt-4" style="display: none;">
+                    <h4 class="mb-3">验证结果</h4>
+                    <div id="resultContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function normalizeNumber(num) {
+            // 确保号码显示为两位数格式
+            return String(num).padStart(2, '0');
+        }
+
+        function renderNumbers(numbers, matchInfo = null) {
+            let html = '';
+            // 前区号码
+            for (let i = 0; i < 5; i++) {
+                const normalizedNum = normalizeNumber(numbers[i]);
+                let matched = matchInfo && matchInfo.matched_numbers && 
+                             matchInfo.matched_numbers.front.includes(normalizedNum);
+                html += `<span class="number front-number ${matched ? 'matched' : ''}">${normalizedNum}</span>`;
+            }
+            html += '<span class="separator">+</span>';
+            // 后区号码
+            for (let i = 5; i < 7; i++) {
+                const normalizedNum = normalizeNumber(numbers[i]);
+                let matched = matchInfo && matchInfo.matched_numbers && 
+                             matchInfo.matched_numbers.back.includes(normalizedNum);
+                html += `<span class="number back-number ${matched ? 'matched' : ''}">${normalizedNum}</span>`;
+            }
+            return html;
+        }
+
+        $(document).ready(function() {
+            // 文件选择预览
+            $('#ticket').on('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const fileName = file.name;
+                    $(this).closest('.custom-file-upload').find('p').text(fileName);
+                }
+            });
+
+            // 表单提交
+            $('#uploadForm').on('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                
+                $('.loading').show();
+                $('#result').hide();
+                
+                $.ajax({
+                    url: '/upload',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        $('.loading').hide();
+                        $('#result').show();
+                        let html = '';
+                        
+                        if (response.status === 'pending') {
+                            html = `
+                                <div class="alert alert-info">
+                                    <h5 class="mb-2">${response.message}</h5>
+                                    <p class="mb-0">当前最新期号：${response.latest_period}</p>
+                                    <div class="mt-3">
+                                        <button class="btn btn-sm btn-primary" onclick="location.reload()">
+                                            <i class="fas fa-sync-alt me-1"></i>刷新检查
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        } else if (response.status === 'success') {
+                            html = `
+                                <div class="result-card card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">第${response.period}期（${response.draw_date}）</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="mb-2">开奖号码：</p>
+                                        ${renderNumbers(response.draw_numbers)}
+                                    </div>
+                                </div>
+                            `;
+                            
+                            response.results.forEach((result, index) => {
+                                html += `
+                                    <div class="result-card card">
+                                        <div class="card-body">
+                                            <h6 class="mb-3">第${index + 1}注：</h6>
+                                            <div class="mb-3">
+                                                ${renderNumbers(result.numbers, result.match_result)}
+                                            </div>
+                                            <p class="mb-0 ${result.match_result.prize !== '未中奖' ? 'prize-highlight' : ''}">
+                                                ${result.match_result.prize}
+                                                ${result.match_result.prize !== '未中奖' ? 
+                                                    `<br><small>(前区匹配${result.match_result.front_matches}个, 后区匹配${result.match_result.back_matches}个)</small>` : ''}
+                                            </p>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            html = `<div class="alert alert-danger">${response.message || '处理失败'}</div>`;
+                        }
+                        
+                        $('#resultContent').html(html);
+                    },
+                    error: function(xhr, status, error) {
+                        $('.loading').hide();
+                        $('#result').show();
+                        $('#resultContent').html('<div class="alert alert-danger">处理失败，请重试</div>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

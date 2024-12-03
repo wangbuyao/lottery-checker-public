@@ -1,0 +1,30 @@
+.number {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+    margin: 0 5px;
+    font-weight: bold;
+}
+.front-number {
+    background-color: #f0f0f0;
+}
+.back-number {
+    background-color: #e0e0e0;
+}
+.matched {
+    background-color: #28a745;
+    color: white;
+}
+.separator {
+    display: inline-block;
+    margin: 0 10px;
+    font-weight: bold;
+}
+.prize-highlight {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #dc3545;
+} 
