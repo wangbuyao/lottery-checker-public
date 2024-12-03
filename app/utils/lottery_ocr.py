@@ -4,34 +4,61 @@ import json
 import re
 from typing import List, Dict
 from datetime import datetime
+import configparser
 import os
+from pathlib import Path
 
 # 禁用 macOS 的 tkinter 警告
 os.environ['TK_SILENCE_DEPRECATION'] = '1'
 
-API_KEY = "L92LJuVbttd2XmYpB6zZd67D"
-SECRET_KEY = "PPA41Vvub0mLa5hROBQFeCgsTSK3hpdq"
-
-def get_access_token():
-    """获取百度云API access token"""
-    url = f"https://aip.baidubce.com/oauth/2.0/token?client_id={API_KEY}&client_secret={SECRET_KEY}&grant_type=client_credentials"
-    
-    payload = json.dumps("")
-    headers = {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    }
-
+def get_access_token() -> str:
+    """获取百度AI平台access_token"""
     try:
-        print("[信息] 正在获取access_token...")
-        response = requests.request("POST", url, headers=headers, data=payload)
+        # 读取配置文件
+        config = configparser.ConfigParser()
+        config_path = Path(__file__).parent.parent.parent / 'config.ini'
+        
+        if not config_path.exists():
+            print("[错误] 配置文件不存在，请复制 config.ini.example 为 config.ini 并填写API密钥")
+            return None
+            
+        config.read(config_path, encoding='utf-8')
+        
+        if 'BaiduOCR' not in config:
+            print("[错误] 配置文件中缺少 BaiduOCR 部分")
+            return None
+            
+        api_key = config['BaiduOCR'].get('API_KEY')
+        secret_key = config['BaiduOCR'].get('SECRET_KEY')
+        
+        if not api_key or not secret_key or api_key == 'your_api_key_here' or secret_key == 'your_secret_key_here':
+            print("[错误] 请在配置文件中填写正确的API密钥")
+            return None
 
-        if response.status_code == 200:
-            return str(response.json().get("access_token"))
-        print(f"[错误] 获取access_token失败: {response.text}")
-        return None
+        # 获取token的URL
+        url = "https://aip.baidubce.com/oauth/2.0/token"
+        
+        params = {
+            'grant_type': 'client_credentials',
+            'client_id': api_key,
+            'client_secret': secret_key
+        }
+        
+        response = requests.post(url, params=params)
+        
+        if response.status_code != 200:
+            print(f"[错误] 获取access_token失败: {response.text}")
+            return None
+            
+        result = response.json()
+        if 'access_token' not in result:
+            print(f"[错误] 返回数据中没有access_token: {result}")
+            return None
+            
+        return result['access_token']
+        
     except Exception as e:
-        print(f"[错误] 获取access_token异常: {str(e)}")
+        print(f"[错误] 获取access_token时出错: {str(e)}")
         return None
 
 def recognize_lottery_ticket(image_path: str) -> Dict:
